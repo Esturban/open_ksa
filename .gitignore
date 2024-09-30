@@ -1,0 +1,7 @@
+venv
+*.code-workspace
+**.DS_Store
+opendata
+*.excalidrawlib
+*.pyc
+__pycache__
