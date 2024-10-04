@@ -29,19 +29,12 @@
 
 ## Process Flow
 
-```dot
-digraph G {
-    rankdir=LR;
-    node [shape=box];
-
-    A [label="Start"];
-    B [label="Create SSL Adapter"];
-    C [label="Setup Session"];
-    D [label="Extract Resources"];
-    E [label="Create Directory"];
-    F [label="Download Data"];
-    G [label="End"];
-
-    A -> B -> C -> D -> E -> F -> G;
-}
+```mermaid
+graph LR
+    A[Start] --> B[Create SSL Adapter]
+    B --> C[Setup Session]
+    C --> D[Extract Resources]
+    D --> E[Create Directory]
+    E --> F[Download Data]
+    F --> G[End]
 ```
