@@ -1,0 +1,26 @@
+name: 'PR - Open Data KSA'
+
+on:
+  push:
+    branches:
+    - dev  
+  schedule:
+    - cron: '0 6 * * *'
+
+jobs:
+  pull-request:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: 'pull_request'
+      uses: repo-sync/pull-request@v2
+      with:
+        source_branch: ""                                 # If blank, default: triggered branch
+        destination_branch: "master"                      # If blank, default: master
+        pr_title: "Pulling ${{ github.ref }} into production" # Title of pull request
+        pr_body: ":crown: *Automated PR*    \n These are the updates and changes to the development branch to be pushed into production from staging"              # Full markdown support, requires pr_title to be set
+        pr_reviewer: "Esturban"                         # Comma-separated list (no spaces)
+        pr_assignee: "Esturban"                         # Comma-separated list (no spaces)
+        pr_label: "auto-pr, staging"                               # Comma-separated list (no spaces)
+        pr_allow_empty: true                              # Creates pull request even if there are no changes
+        github_token: ${{ secrets.GITHUB_TOKEN }}
