@@ -55,7 +55,7 @@ graph TD
 
 ### Usage 
 
-To run the script with the dependencies, first install the virtualenvironment:
+To run the script with the dependencies, first install the `virtualenv`:
 
 ```bash
 
@@ -73,3 +73,33 @@ python download_all_org.py
 ```
 
 NOTE: For a different organization, you need to update the parameter in the file for the `org_id` parameter in the function
+
+
+### Release Plan / To DO
+
+- [ ] Create a set of functions to cover the entire API, including:
+    - [ ] Create a function to get the list of organizations
+    - [ ] Create a function to get the list of datasets for an organization
+    - [ ] Create a function to get the list of resources for a dataset
+    - [ ] Create a function to download a resource
+    - [ ] Create a function to check the status of a download
+- [ ] Create a set of unit tests for the functions
+- [ ] Create a set of integration tests for the functions
+- [ ] Create a set of examples for the functions
+- [ ] Create a set of documentation for the functions
+- [ ] Move the repository to a PyPi library
+
+### Contribution
+
+The contribution process is as follows:
+
+1. Clone the repository and create a new branch
+2. Make your changes, following the coding style guidelines
+3. Create a pull request with a detailed description of your changes
+4. Wait for your pull request to be reviewed and approved
+5. Once approved, your changes will be merged and available in the main branch
+
+When contributing to this repository, please first discuss the change you wish to make via issue,
+email, or any other method with the owners of this repository before making a change.
+
+Please note we have a code of conduct, please follow it in all your interactions with the project.
