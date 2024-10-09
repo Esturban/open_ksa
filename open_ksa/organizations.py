@@ -3,7 +3,7 @@ import json
 import csv
 import os
 
-def organizations(headers=None, size=400, page=0, sort='datasetsCount,DESC', target=None):
+def organizations(headers=None, size=400, page=0, sort='datasetsCount,DESC',search=None, target=None):
     """Fetch organizations from the API and save to a file if target is specified.
 
     Args:
@@ -27,8 +27,12 @@ def organizations(headers=None, size=400, page=0, sort='datasetsCount,DESC', tar
         'Upgrade-Insecure-Requests':'1'
         }
 
-    params = {'size': size, 'page': page, 'sort': sort}
 
+    params = {'size': size, 'page': page, 'sort': sort}
+    if search is not None:
+        params['term'] = search
+
+ 
 
     response = requests.get('https://open.data.gov.sa/api/organizations', params=params,headers=headers)
     print(response)
