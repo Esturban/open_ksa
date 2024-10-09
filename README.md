@@ -11,21 +11,20 @@
 ├── download_all_org.py
 ├── opendata (optional - parameter in file)
 ├── requirements.txt
-├── src
+├── open_ksa
 │   ├── download_file.py
+│   ├── organizations.py
 │   ├── get_dataset_resources.py
 │   └── get_org_resources.py
 └── system-drawing.excalidraw
 
 ```
+### Functions Overview  
 
-### How It Works
-
-1. **SSL Adapter**: A custom SSL adapter is created to handle HTTPS requests.
-2. **Session Setup**: A session is created and the custom SSL adapter is mounted.
-3. **Resource Extraction**: The organization ID and dataset IDs are extracted using the [`get_org_resources`](command:_github.copilot.openSymbolFromReferences?%5B%22%22%2C%5B%7B%22uri%22%3A%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2FEVA%2FDownloads%2FWCD%2Fexercises%2Fopen-data-ksa%2Fdownload_all_org.py%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22pos%22%3A%7B%22line%22%3A17%2C%22character%22%3A16%7D%7D%5D%2C%2258b1143f-d36b-4590-bec8-13913091c2ea%22%5D "Go to definition") module.
-4. **Directory Creation**: A directory named after the organization ID is created.
-5. **Data Download**: All data resources for the organization are downloaded using the [`get_dataset_resources`](command:_github.copilot.openSymbolFromReferences?%5B%22%22%2C%5B%7B%22uri%22%3A%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2FEVA%2FDownloads%2FWCD%2Fexercises%2Fopen-data-ksa%2Fdownload_all_org.py%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22pos%22%3A%7B%22line%22%3A17%2C%22character%22%3A35%7D%7D%5D%2C%2258b1143f-d36b-4590-bec8-13913091c2ea%22%5D "Go to definition") module.
+- `organizations()`: Get the organization information, including the option to write to a target file as a CSV or JSON.
+- `get_org_resources(org_id)`: Retrieves the organization name, organization ID, and dataset IDs for the specified organization.
+- `get_dataset_resources(dataset_ids, allowed_exts=['csv', 'xlsx', 'xls'], output_dir='opendata/org_resources', verbose=False)`: Downloads all data resources for the specified dataset IDs.
+- `download_file(session, url, headers, file_path)`: Downloads a file from the specified URL using the provided session and headers.
 
 ### Process Flow
 
@@ -78,10 +77,10 @@ NOTE: For a different organization, you need to update the parameter in the file
 ### Release Plan / To DO
 
 - [ ] Create a set of functions to cover the entire API, including:
-    - [ ] Create a function to get the list of organizations
-    - [ ] Create a function to get the list of datasets for an organization
-    - [ ] Create a function to get the list of resources for a dataset
-    - [ ] Create a function to download a resource
+    - [X] Create a function to get the list of organizations
+    - [X] Create a function to get the list of datasets for an organization
+    - [X] Create a function to get the list of resources for a dataset
+    - [X] Create a function to download a resource
     - [ ] Create a function to check the status of a download
 - [ ] Create a set of unit tests for the functions
 - [ ] Create a set of integration tests for the functions
