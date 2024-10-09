@@ -60,6 +60,7 @@ def organizations(headers=None, size=400, page=0, sort='datasetsCount,DESC', tar
                 # Print the first 10 values in the terminal
                 for item in data['content'][:10]:
                     print(item)
+                return data
             return data
         except requests.exceptions.JSONDecodeError:
             print("Failed to decode JSON. Here is the raw response:")
