@@ -149,3 +149,7 @@ $RECYCLE.BIN/
 *.excalidrawlib
 *.code-workspace
 opendata
+
+# Data types
+*.csv
+*.json
