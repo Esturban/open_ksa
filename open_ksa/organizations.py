@@ -35,11 +35,12 @@ def organizations(headers=None, size=400, page=0, sort='datasetsCount,DESC',sear
  
 
     response = requests.get('https://open.data.gov.sa/api/organizations', params=params,headers=headers)
-    print(response)
+    
     if response.status_code == 200:
         try:
             # Try to parse JSON response
             data = response.json()
+            
             if target is not None:
                 # Check if target is a complete filepath
                 if not os.path.isabs(target):
@@ -61,11 +62,31 @@ def organizations(headers=None, size=400, page=0, sort='datasetsCount,DESC',sear
                         for item in data['content']:
                             writer.writerow(item.values())
             else:
-                # Print the first 10 values in the terminal
-                for item in data['content'][:10]:
-                    print(item)
+                # Extract the first 10 items
+                items = data['content'][:10]
+
+                # Define the headers
+                headers = ["publisherID", "slug","Datasets"]
+
+                # Calculate the maximum width for each column
+                max_widths = [len(header) for header in headers]
+                for item in items:
+                    max_widths[0] = max(max_widths[0], len(item['publisherID']))
+                    max_widths[1] = max(max_widths[1], len(item['slug']))
+                    max_widths[2] = max(max_widths[2], len(str(item['numberOfDatasets'])))
+
+                # Create a format string for each row
+                row_format = "| {:<" + str(max_widths[0]) + "} | {:<" + str(max_widths[1]) + "} | {:<" + str(max_widths[2]) + "} |"
+
+                # Print the header
+                print(row_format.format(*headers))
+                print("-" * (sum(max_widths) + 7))
+
+                # Print each row
+                for item in items:
+                    print(row_format.format(item['publisherID'], item['slug'],item['numberOfDatasets']))
+
                 return data
-            return data
         except requests.exceptions.JSONDecodeError:
             print("Failed to decode JSON. Here is the raw response:")
             print(response.text)
