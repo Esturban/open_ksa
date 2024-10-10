@@ -83,7 +83,6 @@ NOTE: For a different organization, you need to update the parameter in the file
     - [X] Create a function to download a resource
     - [ ] Create a function to check the status of a download
 - [ ] Create a set of unit tests for the functions
-- [ ] Create a set of integration tests for the functions
 - [ ] Create a set of examples for the functions
 - [ ] Create a set of documentation for the functions
 - [ ] Move the repository to a PyPi library
