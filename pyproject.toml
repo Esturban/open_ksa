@@ -18,7 +18,10 @@ dependencies = [
     "urllib3>=2.2.3"
 ]
 
-# Additional identifiers for completeness
+
+[tool.setuptools.dynamic]
+version = {attr = "open_ksa.__version__"}
+
 keywords = ["open data", "KSA", "datasets", "API"]
 classifiers = [
     "Development Status :: 4 - Beta",
