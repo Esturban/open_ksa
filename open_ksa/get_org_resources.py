@@ -1,6 +1,10 @@
-
 import requests
-def get_org_resources(session,org_url = 'https://open.data.gov.sa/data/api/organizations',org_id = 'd69f01cd-ef1b-47e4-ad23-8e58a8d5a468'):
+from .ssl_adapter import SingletonSession
+from urllib.parse import urlparse, quote
+
+def get_org_resources(org_url = 'https://open.data.gov.sa/data/api/organizations',org_id = 'd69f01cd-ef1b-47e4-ad23-8e58a8d5a468'):
+    session = SingletonSession.get_instance()
+    
     headers = {
         'Accept': 'application/json',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',

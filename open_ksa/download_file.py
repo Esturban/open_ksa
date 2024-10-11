@@ -1,5 +1,6 @@
 # Function to download a file
 import requests
+
 def download_file(session, url, headers, file_path):
     try:
         response = session.get(url, headers=headers)

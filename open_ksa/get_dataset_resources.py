@@ -4,17 +4,23 @@ import requests
 
 import time
 
-from src.download_file import download_file
+from .download_file import download_file
 from urllib.parse import urlparse, quote
+from .ssl_adapter import SingletonSession
 
 
-def get_dataset_resources(dataset_ids,session,allowed_exts,output_dir,verbose = False):
+def get_dataset_resources(dataset_ids,allowed_exts=['csv', 'xlsx', 'xls'],output_dir=f"opendata/org_resources",verbose = False):
+    session = SingletonSession.get_instance()
     headers = {
         'Accept': 'application/json',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
         'Referer': 'https://open.data.gov.sa/',
         'Accept-Language': 'en-US,en;q=0.9',
     }
+
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir, exist_ok=True)
+
     # Download each dataset and save it to the directory
     for dataset_id in dataset_ids:
         
