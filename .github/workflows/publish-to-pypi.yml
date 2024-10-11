@@ -6,13 +6,16 @@ jobs:
   build:
     name: Build distribution 📦
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11, 3.12]  # Add other target Python versions here
 
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.x"
+        python-version: ${{ matrix.python-version }}
     - name: Install pypa/build
       run: python3 -m pip install build --user
     - name: Build a binary wheel and a source tarball
@@ -42,6 +45,10 @@ jobs:
       with:
         name: python-package-distributions
         path: dist/
+    - name: Debug Environment Variables
+      run: env  # Print all environment variables for debugging
+    - name: Debug GitHub Context
+      run: echo "${{ toJson(github) }}"  # Print GitHub context for debugging
     - name: Publish distribution 📦 to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
 
