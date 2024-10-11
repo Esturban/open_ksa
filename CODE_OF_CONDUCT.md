@@ -1,4 +1,4 @@
-/*************  ✨ Codeium Command ⭐  *************/
+
 # Code of Conduct
 
 This Code of Conduct outlines our expectations for participants within the Open Data KSA community, as well as steps for reporting unacceptable behavior. We are committed to providing a welcoming and inspiring community for all and expect our code of conduct to be honored by everyone who participates in the Open Data KSA community.
