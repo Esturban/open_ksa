@@ -16,8 +16,6 @@ dependencies = [
     "requests>=2.32.3",
     "urllib3>=2.2.3"
 ]
-homepage = "https://github.com/Esturban/open_ksa"
-repository = { type = "git", url = "https://github.com/Esturban/open_ksa.git" } 
 
 # Additional identifiers for completeness
 keywords = ["open data", "KSA", "datasets", "API"]
