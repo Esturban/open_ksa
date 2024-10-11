@@ -18,6 +18,9 @@ dependencies = [
 ]
 homepage = "https://github.com/Esturban/open_ksa"
 repository = { type = "git", url = "https://github.com/Esturban/open_ksa.git" } 
+source =  "https://github.com/Esturban/open_ksa"
+download = "https://pypi.org/project/open_ksa/#files"
+tracker = "https://github.com/Esturban/open_ksa/issues"
 
 
 keywords = ["open data", "KSA", "datasets", "API"]
@@ -32,11 +35,6 @@ classifiers = [
 maintainers = [
     { name = "Esteban Valencia", email = "me@estebanvalencia.com" }
 ]
-[project.urls]
-homepage = "https://github.com/Esturban/open_ksa#readme"
-source =  "https://github.com/Esturban/open_ksa"
-download = "https://pypi.org/project/open_ksa/#files"
-tracker = "https://github.com/Esturban/open_ksa/issues"
 
 [tool.setuptools]
 packages = ["open_ksa"]
