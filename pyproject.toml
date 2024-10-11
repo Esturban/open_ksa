@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "open_ksa"
-version = "0.0.2"
+version = "0.1.0"
 description = "Commands to download datasets from the Open Data portal of the Kingdom of Saudi Arabia (KSA)."
 authors = [
     { name = "Esteban Valencia", email = "me@estebanvalencia.com" }
@@ -13,8 +13,8 @@ license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.12.1"
 dependencies = [
-    "requests==2.32.3",
-    "urllib3==2.2.3"
+    "requests>=2.32.3",
+    "urllib3>=2.2.3"
 ]
 
 [tool.setuptools]
