@@ -1,5 +1,4 @@
-# examples/organizations_example.py
-
+# examples/scripts/1_organizations.py
 from open_ksa import organizations
 
 def main():
