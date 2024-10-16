@@ -1,0 +1,14 @@
+{
+    // Name of the dev container
+    "name": "open_ksa - package",
+    
+    // Build configuration
+    "build": {
+        // Dockerfile to use for building the container
+        "dockerfile": "Dockerfile",
+        "context": ".."
+    },
+    
+    // User to use inside the container
+    "remoteUser": "root"
+}
