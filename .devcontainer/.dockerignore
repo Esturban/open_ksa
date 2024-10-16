@@ -1,0 +1,11 @@
+.git
+node_modules
+__pycache__
+*.pyc
+*.log
+venv
+.code-workspace
+.egg-info
+dist
+*.csv
+opendata
