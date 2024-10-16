@@ -1,11 +1,11 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools", "wheel", "setuptools_scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "open_ksa"
-version = "0.1.1-dev2"
-#dynamic = ["version"]
+#version = "0.1.2"
+dynamic = ["version"]
 
 description = "Commands to download datasets from the Open Data portal of the Kingdom of Saudi Arabia (KSA)."
 authors = [
@@ -16,11 +16,9 @@ readme = "README.md"
 requires-python = ">=3.9.1"
 dependencies = [
     "requests>=2.32.3",
-    "urllib3>=2.2.3"
+    "urllib3>=2.2.3",
+    "setuptools_scm>=8.0.0"
 ]
-
-
-
 keywords = ["open data", "KSA", "datasets", "API"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -40,9 +38,12 @@ maintainers = [
 [tool.setuptools]
 packages = ["open_ksa"]
 
-#[tool.setuptools.dynamic]
-#version = {attr = "open_ksa.__version__"}
+[tool.setuptools.package-data]
+open_ksa = ["examples/*", "!examples/opendata/*"]
 
+[tool.setuptools_scm]
+version_scheme = "guess-next-dev"
+local_scheme = "node-and-date"
 
 [project.optional-dependencies]
 dev = [

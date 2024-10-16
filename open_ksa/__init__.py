@@ -1,5 +1,7 @@
-#__version__ = "0.1.0"  # Add this line with your desired version
+# open_ksa/__init__.py
+from setuptools_scm import get_version
 
+__version__ = get_version()
 from urllib.parse import urlparse, quote
 from .download_file import download_file
 from .get_dataset_resource import get_dataset_resource
