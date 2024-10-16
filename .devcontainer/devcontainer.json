@@ -8,7 +8,8 @@
         "dockerfile": "Dockerfile",
         "context": ".."
     },
-    
+    ""
+
     // User to use inside the container
     "remoteUser": "root"
 }
