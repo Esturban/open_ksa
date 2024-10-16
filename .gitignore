@@ -153,4 +153,4 @@ opendata
 
 # Data types
 *.csv
-*.json
+#*.json
