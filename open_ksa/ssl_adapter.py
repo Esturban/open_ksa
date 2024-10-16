@@ -4,6 +4,9 @@ from requests.adapters import HTTPAdapter
 import requests
 
 class SSLAdapter(HTTPAdapter):
+    """
+    An HTTPS Transport Adapter that enables SSL connections
+    """
     def init_poolmanager(self, *args, **kwargs):
         context = ssl.create_default_context()
         context.options |= ssl.OP_LEGACY_SERVER_CONNECT
