@@ -1,7 +1,7 @@
 # Function to download a file
 import requests
 
-def download_file(session, url, headers, file_path,verbose = None,skip_blank = True):
+def download_file(session, url, headers, file_path, verbose=None, skip_blank=True):
     """Download the corresponding file from the Open Data Portal
 
     Args:
@@ -17,9 +17,9 @@ def download_file(session, url, headers, file_path,verbose = None,skip_blank = T
     try:
         response = session.get(url, headers=headers)
         response.raise_for_status()  # Raise an HTTPError for bad responses
-        
 
-        content = response.content.decode('utf-8', errors='ignore')
+        # Decode content based on the response's encoding
+        content = response.content.decode(response.encoding or 'utf-8', errors='ignore')
         if content == "NO DATA FOUND" or content.startswith("<html>"):
             if verbose: print(f"Invalid content received from {url}")
             if skip_blank: return 0
