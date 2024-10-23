@@ -5,7 +5,7 @@ import requests
 import os
 import time
 
-def get_dataset_resource(dataset_id,allowed_exts=['csv', 'xlsx', 'xls'], output_dir=f"opendata/org_resources", headers = None, verbose = None):
+def get_dataset_resource(dataset_id,allowed_exts=['csv', 'xlsx', 'xls'], output_dir=f"opendata/org_resources",ext_dir=None, headers = None, verbose = None):
     """For each dataset, download the available resources that meet the extensions criteria
 
     Args:
@@ -13,6 +13,7 @@ def get_dataset_resource(dataset_id,allowed_exts=['csv', 'xlsx', 'xls'], output_
         allowed_exts (list, optional): The list of allowed file extensions to try to download. Defaults to ['csv', 'xlsx', 'xls'].
         output_dir (str, optional): The directory to save the downloaded files. Defaults to f"opendata/org_resources".
         headers (list, optional): The list of headers to use for the request. Defaults to None.
+        ext_dir (bool, optional): The directory to save the downloaded files. Defaults to None.
         verbose (bool, optional): Whether to print verbose output. Defaults to None.
 
     Returns:
@@ -25,9 +26,7 @@ def get_dataset_resource(dataset_id,allowed_exts=['csv', 'xlsx', 'xls'], output_
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
         'Referer': 'https://open.data.gov.sa/',
         'Accept-Language': 'en-US,en;q=0.9',
-        'Host':'open.data.gov.sa',
-        'Upgrade-Insecure-Requests':'1'
-        }
+    }
     #Create the session item for the requests instance
     session = SingletonSession.get_instance()
     dataset_params = {
@@ -42,15 +41,18 @@ def get_dataset_resource(dataset_id,allowed_exts=['csv', 'xlsx', 'xls'], output_
     except requests.exceptions.JSONDecodeError:
         print(f"Failed to decode JSON for dataset {dataset_id}")
         return None
-
+    parent_dir = output_dir
     for resource in dataset_data['resources']:
+            if verbose:print(f"Attempting to download resource: {resource['downloadUrl']}")
             download_url = resource['downloadUrl']
             parsed_url = urlparse(download_url)
-            file_extension = os.path.splitext(parsed_url.path)[1][1:]  # Get the file extension without the dot
-            
+            # Extract the file extension
+            file_name = os.path.basename(parsed_url.path)
+            file_extension = os.path.splitext(file_name)[1].lstrip('.')
+
             # Skip the file if its extension is not in the allowed list
             if file_extension not in allowed_exts:
-                if(verbose):print(f"Skipping file with extension {file_extension}: {download_url}")
+                if verbose:print(f"Skipping file with extension {file_extension}: {download_url}")
                 continue
             
             #URLs to try
@@ -58,7 +60,7 @@ def get_dataset_resource(dataset_id,allowed_exts=['csv', 'xlsx', 'xls'], output_
             lr_url = f'https://open.data.gov.sa/data/api/v1/datasets/{dataset_data['datasetId']}/resources/{resource['id']}/download'
 
             # Construct the output file path
-            file_name = os.path.basename(parsed_url.path)
+            output_dir = parent_dir if ext_dir is None else os.path.join(parent_dir, file_extension)
             resource_file_path = os.path.join(output_dir, file_name)
             
             # Ensure the output directory exists
@@ -82,13 +84,8 @@ def get_dataset_resource(dataset_id,allowed_exts=['csv', 'xlsx', 'xls'], output_
             # Add headers to mimic a browser request
             download_headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
-                'Referer': f'https://open.data.gov.sa/en/datasets/view/{dataset_data['datasetId']}/resources',
-                'Accept': 'application/json, text/javascript, */*; q=0.01',
-                'Accept-Language': 'en-US,en;q=0.9',
-                'Host':'open.data.gov.sa',
-                'Upgrade-Insecure-Requests':'1', 
-                'X-Requested-With': 'XMLHttpRequest',
-                'Connection': 'keep-alive'
+                'Referer': f'https://open.data.gov.sa/',
+                'Accept-Language': 'en-US,en;q=0.9'
             }
             
             if(verbose):
@@ -96,12 +93,12 @@ def get_dataset_resource(dataset_id,allowed_exts=['csv', 'xlsx', 'xls'], output_
                 print(f"SA URL: {safe_url}")
             
             # Attempt to download using the safe URL
-            file_size = download_file(session,lr_url, download_headers, resource_file_path)
+            file_size = download_file(session,safe_url, download_headers, resource_file_path)
             
             # If the file is less than 250 bytes, attempt to download using the original URL
-            if file_size <= 250:
+            if file_size == 0:
                 if(verbose):print(f"File {file_name} is less than 250 bytes, retrying with original URL")
-                file_size = download_file(session,safe_url, download_headers, resource_file_path)
+                file_size = download_file(session,lr_url, download_headers, resource_file_path)
             
             if file_size > 250:
                 if(verbose):print(f"Downloaded and saved file: {resource_file_path}")
