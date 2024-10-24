@@ -20,7 +20,7 @@ def download_file(session, url, headers, file_path, verbose=None, skip_blank=Tru
 
         # Decode content based on the response's encoding
         content = response.content.decode(response.encoding or 'utf-8', errors='ignore')
-        if content == "NO DATA FOUND" or content.startswith("<html>"):
+        if content == "NO DATA FOUND" or content.startswith("<html>") or not content.strip():
             if verbose: print(f"Invalid content received from {url}")
             if skip_blank: return 0
         
