@@ -57,7 +57,7 @@ def get_dataset_resource(dataset_id,allowed_exts=['csv', 'xlsx', 'xls'], output_
             
             #URLs to try
             safe_url = parsed_url._replace(path=quote(parsed_url.path, safe='/')).geturl()
-            lr_url = f'https://open.data.gov.sa/data/api/v1/datasets/{dataset_data['datasetId']}/resources/{resource['id']}/download'
+            lr_url = f"https://open.data.gov.sa/data/api/v1/datasets/{dataset_data['datasetId']}/resources/{resource['id']}/download"
 
             # Construct the output file path
             output_dir = parent_dir if ext_dir is None else os.path.join(parent_dir, file_extension)
