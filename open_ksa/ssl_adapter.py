@@ -1,4 +1,5 @@
 import ssl
+import sys
 from urllib3 import poolmanager
 from requests.adapters import HTTPAdapter
 import requests
@@ -9,7 +10,8 @@ class SSLAdapter(HTTPAdapter):
     """
     def init_poolmanager(self, *args, **kwargs):
         context = ssl.create_default_context()
-        context.options |= ssl.OP_LEGACY_SERVER_CONNECT
+        if sys.version_info >= (3, 12):
+            context.options |= ssl.OP_LEGACY_SERVER_CONNECT
         kwargs['ssl_context'] = context
         return super(SSLAdapter, self).init_poolmanager(*args, **kwargs)
 
