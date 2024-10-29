@@ -1,15 +1,17 @@
-# Use the official Python slim image as a parent image
-FROM python:3.12.1-bullseye
+# Stage 1: Build stage
+FROM python:3.12.1-alpine as build
+RUN apk add --no-cache git build-base
+WORKDIR /workspaces
 
-# Set the working directory in the container
-WORKDIR /workspace
+# Copy the requirements.txt file and install dependencies
+COPY requirements.txt /workspaces/
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Copy the requirements.txt file into the container at /workspace
-COPY requirements.txt /workspace/
+COPY examples/ open_ksa/ pyproject.toml .devcontainer/ .github/ /workspaces/
 
-# Install any needed packages specified in requirements.txt
-RUN pip3 install --upgrade pip
-RUN pip3 install -r requirements.txt
-
-# Copy the rest of the application code into the container
-COPY . /workspace
+# Stage 2: Final stage
+FROM python:3.12.1-alpine
+RUN apk add --no-cache git
+WORKDIR /workspaces
+COPY --from=build /workspaces /workspaces

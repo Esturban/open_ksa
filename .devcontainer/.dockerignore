@@ -9,3 +9,10 @@ venv
 dist
 *.csv
 opendata
+data
+dist/*
+*.csv
+opendata/*
+*/opendata/*
+*venv**
+venv/*
