@@ -12,10 +12,11 @@ def test_get_dataset_resources():
     # we named it ks for 'King Saud University'
     organization_id = resources['organization_id']
 
-    get_dataset_resources(dataset_ids=dataset_ids, 
+    get_dataset_resources(dataset_ids=dataset_ids[0:10], 
                          output_dir=f"opendata/{resources['organization_name'].strip().replace(' ', '_').lower()}",
                          allowed_exts=['csv'],
-                         verbose=False
+                         verbose=False,
+                         show_progress=True
                          )
 
 if __name__ == "__main__":
