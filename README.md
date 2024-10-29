@@ -49,43 +49,49 @@ graph TD
         G --> H[Save Data Locally]
     end
 
-    H --> I[End]
+    subgraph Example - 3_get_dataset_resources.py
+        H --> J[Get Organization ID]
+        J --> J1[Get All Dataset IDs]
+        J1 --> K[Loop Through Dataset IDs]
+        K --> L[Download Each Resource]
+        L --> M[Save Each Resource Locally]
+        M --> N[Run Jupyter Notebook 1_download_data.ipynb]
+    end
+
+    N --> I[End]
 ```
 
-### Usage 
+### Installation 
 
-To run the script with the dependencies, first install the `virtualenv`:
+To begin collecting data using the `open-ksa` package, simply install via `pip`:
 
 ```bash
-
-python -m venv venv
-
-pip install -r requirements.txt
-
+pip install open-ksa
 ```
 
+### Usage
 
-Then you'll be able to run the python primary python script successfully:
+For examples on how to use the package, see the following folders:
+- [Scripts](/examples/scripts/)
+- [Workbooks](/examples/workbooks/)
 
-```bash
-python download_all_org.py
-```
+These illustrate how to use the package in a script or workbook and examples on how to collect information for one or multiple organizations.
 
 NOTE: For a different organization, you need to update the parameter in the file for the `org_id` parameter in the function
 
 
 ### Release Plan / To DO
 
-- [ ] Create a set of functions to cover the entire API, including:
+- [X] Create a set of functions to cover the entire API, including:
     - [X] Create a function to get the list of organizations
     - [X] Create a function to get the list of datasets for an organization
     - [X] Create a function to get the list of resources for a dataset
     - [X] Create a function to download a resource
-    - [ ] Create a function to check the status of a download
-- [ ] Create a set of unit tests for the functions
-- [ ] Create a set of examples for the functions
+    - [X] Create a function to check the status of a download
+- [X] Create a set of unit tests for the functions
+- [X] Create a set of examples for the functions
 - [ ] Create a set of documentation for the functions
-- [ ] Move the repository to a PyPi library
+- [X] Move the repository to a PyPi library
 
 ### Contribution
 
