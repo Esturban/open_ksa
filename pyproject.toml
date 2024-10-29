@@ -17,7 +17,8 @@ requires-python = ">=3.9.1"
 dependencies = [
     "requests>=2.32.3",
     "urllib3>=2.2.3",
-    "setuptools_scm>=8.0.0"
+    "setuptools_scm>=8.0.0",
+    "tqdm>=4.0.0"
 ]
 keywords = ["open data", "KSA", "datasets", "API"]
 classifiers = [
