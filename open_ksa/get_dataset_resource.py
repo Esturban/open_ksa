@@ -39,10 +39,22 @@ def get_dataset_resource(dataset_id,allowed_exts=['csv', 'xlsx', 'xls'], output_
     try:
         dataset_data = dataset_response.json()
     except requests.exceptions.JSONDecodeError:
-        print(f"Failed to decode JSON for dataset {dataset_id}")
+        if verbose: print(f"Failed to decode JSON for dataset {dataset_id}")
         return None
     parent_dir = output_dir
+
+    # Initialize statistics for this dataset
+    stats = {
+        'total': 0,
+        'checked': 0,
+        'failed': 0,
+        'skipped': 0,  # Initialize skipped count
+        'downloaded':0,
+        'extensions': allowed_exts
+    }
+
     for resource in dataset_data['resources']:
+            stats['total'] += 1
             if verbose:print(f"Attempting to download resource: {resource['downloadUrl']}")
             download_url = resource['downloadUrl']
             parsed_url = urlparse(download_url)
@@ -53,8 +65,9 @@ def get_dataset_resource(dataset_id,allowed_exts=['csv', 'xlsx', 'xls'], output_
             # Skip the file if its extension is not in the allowed list
             if file_extension not in allowed_exts:
                 if verbose:print(f"Skipping file with extension {file_extension}: {download_url}")
+                stats['skipped'] += 1
                 continue
-            
+            stats['checked'] += 1
             #URLs to try
             safe_url = parsed_url._replace(path=quote(parsed_url.path, safe='/')).geturl()
             lr_url = f"https://open.data.gov.sa/data/api/v1/datasets/{dataset_data['datasetId']}/resources/{resource['id']}/download"
@@ -68,7 +81,8 @@ def get_dataset_resource(dataset_id,allowed_exts=['csv', 'xlsx', 'xls'], output_
 
             # Check if the file already exists and its size
             if os.path.exists(resource_file_path) and os.path.getsize(resource_file_path) > 250:
-                if(verbose):print(f"Skipping existing file: {resource_file_path}")
+                if(verbose): print(f"Skipping existing file: {resource_file_path}")
+                stats['downloaded'] += 1
                 continue
 
             # Check if the file already exists, its size, and its age
@@ -76,9 +90,10 @@ def get_dataset_resource(dataset_id,allowed_exts=['csv', 'xlsx', 'xls'], output_
                 file_age = time.time() - os.path.getmtime(resource_file_path)
                 if os.path.getsize(resource_file_path) > 250 and file_age <= 7 * 24 * 60 * 60:
                     if(verbose):print(f"Skipping existing file: {resource_file_path}")
+                    stats['downloaded'] += 1
                     continue
                 elif file_age > 7 * 24 * 60 * 60:
-                    if(verbose):print(f"Deleting old file: {resource_file_path}")
+                    if(verbose): print(f"Deleting old file: {resource_file_path}")
                     os.remove(resource_file_path)
 
             # Add headers to mimic a browser request
@@ -93,15 +108,19 @@ def get_dataset_resource(dataset_id,allowed_exts=['csv', 'xlsx', 'xls'], output_
                 print(f"SA URL: {safe_url}")
             
             # Attempt to download using the safe URL
-            file_size = download_file(session,safe_url, download_headers, resource_file_path)
+            file_size = download_file(session,safe_url, download_headers, resource_file_path, resource_id=resource['id'],verbose = verbose,skip_blank=True)
             
             # If the file is less than 250 bytes, attempt to download using the original URL
             if file_size == 0:
-                if(verbose):print(f"File {file_name} is less than 250 bytes, retrying with original URL")
-                file_size = download_file(session,lr_url, download_headers, resource_file_path)
+                if(verbose): print(f"File {file_name} is less than 250 bytes, retrying with original URL")
+                file_size = download_file(session,lr_url, download_headers, resource_file_path, resource_id=resource['id'],verbose = verbose,skip_blank=True)
             
             if file_size > 250:
                 if(verbose):print(f"Downloaded and saved file: {resource_file_path}")
+                stats['downloaded'] += 1
             else:
                 if(verbose):print(f"Failed to download a valid file for: {file_name}")
+                stats['failed'] += 1
+
+    return stats
 
