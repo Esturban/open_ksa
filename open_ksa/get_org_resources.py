@@ -21,15 +21,22 @@ def get_org_resources(org_url = 'https://open.data.gov.sa/data/api/organizations
         'version': '-1',
         'organization': org_id
     }
-
+    max_attempts = 3
+    attempt = 0
+    data = {}
     # Make the request using the custom session
-    response = session.get(org_url, params=params, headers=headers)
-    
-    try:
+    while attempt < max_attempts:
+        attempt += 1
+        response = session.get(org_url, params=params, headers=headers)    
+        try:
             data = response.json()
-    except requests.exceptions.JSONDecodeError:
+            if data.get('nameEn'): break
+        except requests.exceptions.JSONDecodeError:
             print(f"Failed to decode JSON for dataset {org_id}")
     
+    if not data.get('nameEn'):
+        return None
+
     #print(data['nameEn'])
     return {'organization_name':data['nameEn'], 
             'organization_id':data['id'], 
