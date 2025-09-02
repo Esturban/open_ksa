@@ -24,6 +24,7 @@ def organizations(headers=None, size=400, page=0, sort='datasetsCount,DESC',sear
         'Referer': 'https://open.data.gov.sa/',
         'Accept-Language': 'en-US,en;q=0.9',
         'Host':'open.data.gov.sa',
+        'sec-gpc':'1',
         'Upgrade-Insecure-Requests':'1'
         }
 
