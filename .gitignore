@@ -155,3 +155,17 @@ opendata
 # Data types
 *.csv
 *.json
+.specify
+.cursor
+.ruff_cache
+.pytest_cache
+.mypy_cache
+.pytype
+.pyre
+.vscode
+.DS_Store
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
