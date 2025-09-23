@@ -3,7 +3,10 @@ import json
 import csv
 import os
 
-def organizations(headers=None, size=400, page=0, sort='datasetsCount,DESC',search=None, target=None):
+
+def organizations(
+    headers=None, size=400, page=0, sort="datasetsCount,DESC", search=None, target=None
+):
     """Fetch organizations from the API and save to a file if target is specified.
 
     Args:
@@ -17,67 +20,81 @@ def organizations(headers=None, size=400, page=0, sort='datasetsCount,DESC',sear
         dict: The response from the API call for the organization.
     """
     if headers is None:
-        
+
         headers = {
-        'Accept': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
-        'Referer': 'https://open.data.gov.sa/',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Host':'open.data.gov.sa',
-        'sec-gpc':'1',
-        'Upgrade-Insecure-Requests':'1'
+            "Accept": "application/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+            "Referer": "https://open.data.gov.sa/",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Host": "open.data.gov.sa",
+            "sec-gpc": "1",
+            "Upgrade-Insecure-Requests": "1",
         }
 
-
-    params = {'size': size, 'page': page, 'sort': sort}
+    params = {"size": size, "page": page, "sort": sort}
     if search is not None:
-        params['term'] = search
+        params["term"] = search
 
- 
+    # Ensure sec-gpc header is present (privacy signal expected by some endpoints)
+    if headers is None:
+        headers = {}
+    headers.setdefault("sec-gpc", "1")
 
-    response = requests.get('https://open.data.gov.sa/api/organizations', params=params,headers=headers)
-    
+    response = requests.get(
+        "https://open.data.gov.sa/api/organizations", params=params, headers=headers
+    )
+
     if response.status_code == 200:
         try:
             # Try to parse JSON response
             data = response.json()
-            
+
             if target is not None:
                 # Check if target is a complete filepath
                 if not os.path.isabs(target):
                     target = os.path.join(os.getcwd(), target)
-                
+
                 _, file_extension = os.path.splitext(target)
-                if file_extension.lower() == '.json':
+                if file_extension.lower() == ".json":
                     # Write data to JSON file
-                    with open(target, 'w') as jsonfile:
+                    with open(target, "w") as jsonfile:
                         json.dump(data, jsonfile, indent=4)
                     return data
-                elif file_extension.lower() == '.csv':
+                elif file_extension.lower() == ".csv":
                     # Write data to CSV file
-                    with open(target, 'w', newline='') as csvfile:
+                    with open(target, "w", newline="") as csvfile:
                         writer = csv.writer(csvfile)
                         # Write headers
-                        writer.writerow(data['content'][0].keys())
+                        writer.writerow(data["content"][0].keys())
                         # Write data rows
-                        for item in data['content']:
+                        for item in data["content"]:
                             writer.writerow(item.values())
             else:
                 # Extract the first 10 items
-                items = data['content'][:10]
+                items = data["content"][:10]
 
                 # Define the headers
-                headers = ["publisherID", "slug","Datasets"]
+                headers = ["publisherID", "slug", "Datasets"]
 
                 # Calculate the maximum width for each column
                 max_widths = [len(header) for header in headers]
                 for item in items:
-                    max_widths[0] = max(max_widths[0], len(item['publisherID']))
-                    max_widths[1] = max(max_widths[1], len(item['slug']))
-                    max_widths[2] = max(max_widths[2], len(str(item['numberOfDatasets'])))
+                    max_widths[0] = max(max_widths[0], len(item["publisherID"]))
+                    max_widths[1] = max(max_widths[1], len(item["slug"]))
+                    max_widths[2] = max(
+                        max_widths[2], len(str(item["numberOfDatasets"]))
+                    )
 
                 # Create a format string for each row
-                row_format = "| {:<" + str(max_widths[0]) + "} | {:<" + str(max_widths[1]) + "} | {:<" + str(max_widths[2]) + "} |"
+                row_format = (
+                    "| {:<"
+                    + str(max_widths[0])
+                    + "} | {:<"
+                    + str(max_widths[1])
+                    + "} | {:<"
+                    + str(max_widths[2])
+                    + "} |"
+                )
 
                 # Print the header
                 print(row_format.format(*headers))
@@ -85,7 +102,11 @@ def organizations(headers=None, size=400, page=0, sort='datasetsCount,DESC',sear
 
                 # Print each row
                 for item in items:
-                    print(row_format.format(item['publisherID'], item['slug'],item['numberOfDatasets']))
+                    print(
+                        row_format.format(
+                            item["publisherID"], item["slug"], item["numberOfDatasets"]
+                        )
+                    )
 
                 return data
         except requests.exceptions.JSONDecodeError:
