@@ -15,11 +15,22 @@ def test_fetch_and_load_contract_exists():
     assert hasattr(downloader, "fetch_and_load")
 
 
-def test_fetch_and_load_raises_not_implemented():
+def test_fetch_and_load_returns_manifest_object():
     import importlib
 
     downloader = importlib.import_module("open_ksa.downloader")
-    # fetch_and_load now has a working conservative implementation; assert it returns manifest,data_map
-    manifest, data_map = downloader.fetch_and_load(dataset_id="nonexistent", dest=".")
-    assert isinstance(manifest, dict)
+    models = importlib.import_module("open_ksa.models")
+
+    manifest, data_map = downloader.fetch_and_load(
+        selection={
+            "scope_type": "dataset",
+            "dataset_ids": [],
+            "organization_ids": [],
+            "resource_ids": [],
+        },
+        dest=".",
+    )
+    assert isinstance(manifest, models.DownloadManifest)
     assert isinstance(data_map, dict)
+    assert hasattr(manifest, "entries")
+    assert hasattr(manifest, "completeness_summary")

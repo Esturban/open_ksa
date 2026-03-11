@@ -11,9 +11,10 @@ def test_cli_contract_exists():
 def test_cli_raises_not_implemented():
     import importlib
     cli = importlib.import_module("open_ksa.cli")
+    models = importlib.import_module("open_ksa.models")
     with pytest.raises(NotImplementedError):
         cli.browse_cli()
-    # download_cli now provides a safe demo manifest fallback; ensure it returns a manifest dict
+    # download_cli should expose the canonical manifest object
     manifest = cli.download_cli(dest=".", interactive=False)
-    assert isinstance(manifest, dict)
-    assert "entries" in manifest
+    assert isinstance(manifest, models.DownloadManifest)
+    assert hasattr(manifest, "entries")
