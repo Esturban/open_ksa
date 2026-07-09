@@ -1,6 +1,5 @@
 import requests
 from .ssl_adapter import SingletonSession
-from urllib.parse import urlparse, quote
 
 
 def get_org_resources(

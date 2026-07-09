@@ -4,7 +4,6 @@ from unittest.mock import patch, MagicMock
 from open_ksa.get_dataset_resource import (
     get_dataset_resource,
 )  # Adjust the import based on your package structure
-import os
 
 
 class TestGetDatasetResource(unittest.TestCase):

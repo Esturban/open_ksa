@@ -1,4 +1,3 @@
-import pytest
 
 
 def test_organization_model_fields_exist():

@@ -4,7 +4,7 @@ Provide minimal adapter stubs: CSVAdapter, JSONAdapter, ExcelAdapter.
 These will be extended in later tasks.
 """
 
-from typing import Any, List
+from typing import List
 import csv
 import json
 

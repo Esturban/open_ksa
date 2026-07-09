@@ -1,4 +1,3 @@
-import pytest
 
 
 def test_dataset_model_fields_exist():

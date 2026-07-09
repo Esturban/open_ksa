@@ -142,10 +142,12 @@ def translate_single_file(file_path, base_directory, verbose=None):
             try:
                 df = pd.read_json(file_path)
             except ValueError as e:
-                if verbose: print(f"Error reading JSON file {file_path}: {e}")
+                if verbose:
+                    print(f"Error reading JSON file {file_path}: {e}")
                 return (False, filename, str(e))
         else:
-            if verbose: print(f"Unsupported file extension: {file_extension}")
+            if verbose:
+                print(f"Unsupported file extension: {file_extension}")
             return (False, filename, f"Unsupported file extension: {file_extension}")
         
         # Translate columns
@@ -198,11 +200,11 @@ def translate_files(file_paths, base_directory, verbose=None):
                 print(f"Unexpected error with {filename}: {e}")
         
         # Print summary
-        print(f"\n=== Translation Summary ===")
+        print("\n=== Translation Summary ===")
         print(f"Successfully translated: {len(successes)} files")
         print(f"Failed: {len(failures)} files")
         if failures:
-            print(f"\nFailed files:")
+            print("\nFailed files:")
             for filename, error in failures:
                 print(f"  - {filename}: {error}")
 

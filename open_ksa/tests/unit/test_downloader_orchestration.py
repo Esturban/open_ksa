@@ -90,14 +90,6 @@ def test_download_resource_skips_existing_valid_file(tmp_path):
 
 
 def test_fetch_and_load_resource_scope_filters_by_resource_id(tmp_path):
-    resource_one = Resource(
-        resource_id="res-1",
-        dataset_id="ds-1",
-        organization_id="org-1",
-        name="one.csv",
-        download_url="https://example.com/one.csv",
-        declared_format="csv",
-    )
     resource_two = Resource(
         resource_id="res-2",
         dataset_id="ds-1",
