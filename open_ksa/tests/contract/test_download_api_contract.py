@@ -1,4 +1,3 @@
-import pytest
 
 
 def test_fetch_and_load_contract_exists():

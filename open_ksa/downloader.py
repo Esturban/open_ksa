@@ -5,7 +5,7 @@ import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Tuple, Union
+from typing import IO, Dict, Iterable, List, Optional, Tuple, Union
 from urllib.parse import quote, urlparse
 
 import requests
@@ -504,7 +504,7 @@ def browse(*args, **kwargs):
     raise NotImplementedError("browse is not implemented yet")
 
 
-def sample_and_load(source: Union[str, "file"], nrows: Optional[int] = None, fmt: Optional[str] = None):
+def sample_and_load(source: Union[str, IO], nrows: Optional[int] = None, fmt: Optional[str] = None):
     """Load a small sample from a local file path or file-like object."""
     rows = None
     if isinstance(source, str):

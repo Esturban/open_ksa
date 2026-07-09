@@ -9,9 +9,6 @@ def test_get_dataset_resources():
     resources = get_org_resources(org_id=org_id)
     # Here, we grab all of the different dataset_ids
     dataset_ids = resources["dataset_ids"]
-    # Here, we grab the organization ID as well. But we can use the same organization ID from the ks value
-    # we named it ks for 'King Saud University'
-    organization_id = resources["organization_id"]
 
     get_dataset_resources(
         dataset_ids=dataset_ids[0:10],

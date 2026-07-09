@@ -1,4 +1,3 @@
-import pytest
 
 
 def test_reader_adapter_interface_exists():

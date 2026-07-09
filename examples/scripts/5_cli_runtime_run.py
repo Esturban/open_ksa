@@ -10,12 +10,12 @@ if str(repo_root) not in sys.path:
 
 def main(dataset_id: str | None = None, dest: str = "tmp_real_cli", sample_size: int = 5, demo: bool = False):
     try:
-        from open_ksa import cli, downloader
+        from open_ksa import cli
     except Exception:
         # Try to ensure repo root is on sys.path and retry
         if str(repo_root) not in sys.path:
             sys.path.insert(0, str(repo_root))
-        from open_ksa import cli, downloader
+        from open_ksa import cli
 
     Path(dest).mkdir(parents=True, exist_ok=True)
 

@@ -1,4 +1,3 @@
-import pytest
 
 
 def test_resource_model_fields_exist():

@@ -1,6 +1,5 @@
 import ssl
 import sys
-from urllib3 import poolmanager
 from requests.adapters import HTTPAdapter
 import requests
 

@@ -9,7 +9,7 @@ import time
 def get_dataset_resource(
     dataset_id,
     allowed_exts=["csv", "xlsx", "xls"],
-    output_dir=f"opendata/org_resources",
+    output_dir="opendata/org_resources",
     ext_dir=None,
     headers=None,
     verbose=None,

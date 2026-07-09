@@ -1,4 +1,3 @@
-import pytest
 
 
 def test_manifest_model_fields_exist():
