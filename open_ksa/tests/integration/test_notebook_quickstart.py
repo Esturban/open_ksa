@@ -6,12 +6,13 @@ def test_quickstart_api_flow_exists(monkeypatch):
     import importlib
 
     downloader = importlib.import_module("open_ksa.downloader")
+    models = importlib.import_module("open_ksa.models")
     assert hasattr(downloader, "browse")
     assert hasattr(downloader, "fetch_and_load")
-    # fetch_and_load now implemented conservatively; call it and assert types
+    # fetch_and_load should return the canonical manifest object and a preview map
     try:
         manifest, data_map = downloader.fetch_and_load(dest='.')
-        assert isinstance(manifest, dict)
+        assert isinstance(manifest, models.DownloadManifest)
         assert isinstance(data_map, dict)
     except NotImplementedError:
         pytest.skip("fetch_and_load not implemented in this environment")

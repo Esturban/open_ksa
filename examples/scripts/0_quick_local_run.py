@@ -3,7 +3,6 @@ try:
     from open_ksa import organizations
 except Exception:
     # fallback: local import path
-    import importlib.util
     import sys
     import pathlib
 

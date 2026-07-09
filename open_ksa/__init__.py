@@ -11,13 +11,12 @@ except Exception:
     # Fallback to a default version if SCM metadata is not available
     __version__ = "0.0.0"
 
-from urllib.parse import urlparse, quote
-from .download_file import download_file
-from open_ksa.get_dataset_resource import get_dataset_resource
-from open_ksa.get_dataset_resources import get_dataset_resources
-from open_ksa.get_org_resources import get_org_resources
-from open_ksa.ssl_adapter import SSLAdapter, SingletonSession
-from open_ksa.organizations import organizations
+from .download_file import download_file as download_file
+from open_ksa.get_dataset_resource import get_dataset_resource as get_dataset_resource
+from open_ksa.get_dataset_resources import get_dataset_resources as get_dataset_resources
+from open_ksa.get_org_resources import get_org_resources as get_org_resources
+from open_ksa.ssl_adapter import SSLAdapter as SSLAdapter, SingletonSession as SingletonSession
+from open_ksa.organizations import organizations as organizations
 from . import cli as _cli_module
 
 

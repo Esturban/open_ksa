@@ -8,7 +8,7 @@ from .get_dataset_resource import get_dataset_resource
 def get_dataset_resources(
     dataset_ids,
     allowed_exts=["csv", "xlsx", "xls"],
-    output_dir=f"opendata/org_resources",
+    output_dir="opendata/org_resources",
     verbose=None,
     ext_dir=None,
     max_workers=None,
