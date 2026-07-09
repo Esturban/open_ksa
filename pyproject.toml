@@ -50,6 +50,12 @@ open_ksa = ["examples/*", "!examples/opendata/*"]
 version_scheme = "guess-next-dev"
 local_scheme = "no-local-version"
 
+[tool.pytest.ini_options]
+# Scope discovery to the real test suite -- without this, pytest's default
+# repo-wide "test_*.py" scan also picks up examples/workbooks/test_api.py,
+# a demo script (not a test) that imports openai, which isn't a CI dependency.
+testpaths = ["open_ksa/tests"]
+
 [project.optional-dependencies]
 dev = [
     "build>=1.2.2",
