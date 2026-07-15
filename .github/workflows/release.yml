@@ -19,6 +19,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
           # Use existing tag on this commit, or generate a date-based one
           TAG=$(git tag --points-at HEAD | head -1)
           if [ -z "$TAG" ]; then
