@@ -38,7 +38,6 @@ def get_org_resources(
     if not data.get("nameEn"):
         return None
 
-    # print(data['nameEn'])
     return {
         "organization_name": data["nameEn"],
         "organization_id": data["id"],
