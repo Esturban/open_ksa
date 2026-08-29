@@ -120,6 +120,7 @@ Tests are located in the `open_ksa/tests` directory. From a fresh clone:
 
 ```bash
 git clone https://github.com/Esturban/open_ksa.git && cd open_ksa
+git checkout dev  # the CLI and console script live here until this branch merges to master
 python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
 .venv/bin/pytest open_ksa/tests
 ```
