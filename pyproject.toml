@@ -36,6 +36,12 @@ maintainers = [
     { name = "Esteban Valencia", email = "me@estebanvalencia.com" }
 ]
 
+[project.urls]
+Homepage = "https://github.com/Esturban/open_ksa"
+Repository = "https://github.com/Esturban/open_ksa"
+Changelog = "https://github.com/Esturban/open_ksa/blob/dev/RELEASE_NOTES.md"
+"KSA Open Data Portal" = "https://open.data.gov.sa/"
+
 [tool.setuptools]
 include-package-data = false
 
