@@ -21,6 +21,22 @@ def _print_menu(title: str, items: List[Dict[str, str]]) -> None:
             print(f" {i}) {label}")
 
 
+def _select_from_menu(title: str, items: List[Dict[str, str]], value_key: str):
+    """Print a numbered menu, prompt for a choice, and return the chosen item's `value_key`.
+
+    Returns None if the user quits ('q'/'quit'). Raises ValueError on invalid input.
+    """
+    _print_menu(title, items)
+    choice = input("Downloader> ").strip()
+    if choice.lower() in ("q", "quit"):
+        return None
+    try:
+        idx = int(choice) - 1
+        return items[idx][value_key]
+    except Exception:
+        raise ValueError("Invalid selection")
+
+
 def browse_organizations(query: Optional[str] = None, limit: int = 20, interactive: bool = True) -> List[Dict]:
     """List organizations. In interactive mode prompt the user to select one and return the UUID.
 
@@ -29,20 +45,12 @@ def browse_organizations(query: Optional[str] = None, limit: int = 20, interacti
     res = organizations(search=query, size=limit)
     items = []
     for o in res.get("content", []):
-        items.append({"organization_id": o.get("id"), "title": o.get("nameEn") or o.get("name"), "dataset_count": o.get("numberOfDatasets") or o.get("datasetsCount")})
+        items.append({"organization_id": o.get("publisherID") or o.get("id"), "title": o.get("nameEn") or o.get("name"), "dataset_count": o.get("numberOfDatasets") or o.get("datasetsCount")})
 
     if not interactive:
         return items
 
-    _print_menu("Organizations", items)
-    choice = input("Downloader> ").strip()
-    if choice.lower() in ("q", "quit"):
-        return None
-    try:
-        idx = int(choice) - 1
-        return items[idx]["organization_id"]
-    except Exception:
-        raise ValueError("Invalid selection")
+    return _select_from_menu("Organizations", items, "organization_id")
 
 
 def browse_datasets(organization_id: str, query: Optional[str] = None, limit: int = 20, interactive: bool = True) -> List[Dict]:
@@ -56,15 +64,7 @@ def browse_datasets(organization_id: str, query: Optional[str] = None, limit: in
     if not interactive:
         return items
 
-    _print_menu("Datasets", items)
-    choice = input("Downloader> ").strip()
-    if choice.lower() in ("q", "quit"):
-        return None
-    try:
-        idx = int(choice) - 1
-        return items[idx]["dataset_id"]
-    except Exception:
-        raise ValueError("Invalid selection")
+    return _select_from_menu("Datasets", items, "dataset_id")
 
 
 def list_resources(dataset_id: str) -> List[Dict]:

@@ -93,8 +93,10 @@ This newer layer exists, but only part of the spec is implemented.
   - They do not yet prove the full contract described in the spec.
 
 - The spec is aspirational relative to the code.
-  - `browse()` is unimplemented.
-  - `browse_cli()` is unimplemented.
+  - `browse()` (in `downloader.py`) is unimplemented -- distinct from `cli.browse_cli()` below.
+  - `cli.browse_cli()` is implemented (OPS-2378): wires `notebook.browse_organizations`/
+    `notebook.browse_datasets` into a search-organization -> pick-dataset -> download flow,
+    with no organization ID needed up front. Live-verified end to end.
   - `list_resources()` returns synthetic placeholder data.
   - `select_and_sample()` does not sample yet.
   - `ExcelAdapter.read_file()` is unimplemented.

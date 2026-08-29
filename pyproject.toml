@@ -36,6 +36,9 @@ maintainers = [
     { name = "Esteban Valencia", email = "me@estebanvalencia.com" }
 ]
 
+[project.scripts]
+open-ksa = "open_ksa.cli:main"
+
 [project.urls]
 Homepage = "https://github.com/Esturban/open_ksa"
 Repository = "https://github.com/Esturban/open_ksa"

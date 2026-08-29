@@ -12,6 +12,23 @@ Install the package via pip:
 pip install open-ksa
 ```
 
+## Command Line Usage
+
+`pip install open-ksa` gives you an `open-ksa` command. You do not need to know an
+organization ID up front -- `browse` searches and lets you pick:
+
+```bash
+open-ksa browse --query water
+```
+
+This lists matching organizations, asks you to pick one, lists its datasets, asks you to
+pick one, and downloads it into the current directory (`--dest` to choose another). Once
+you already know an ID, `download` skips straight to it:
+
+```bash
+open-ksa download --dataset-id <dataset-id> --organization-id <organization-id>
+```
+
 ## Key Features
 
 - Fetch organization details and metadata.
@@ -99,9 +116,18 @@ graph TD
 
 ## Running Tests
 
-Tests are located in the `open_ksa/tests` directory. Run tests using:
+Tests are located in the `open_ksa/tests` directory. From a fresh clone:
 
 ```bash
+git clone https://github.com/Esturban/open_ksa.git && cd open_ksa
+python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
+.venv/bin/pytest open_ksa/tests
+```
+
+If you already have the repo and a virtual environment active:
+
+```bash
+pip install -e ".[dev]"
 pytest open_ksa/tests
 ```
 
