@@ -1,5 +1,7 @@
 from unittest.mock import patch
 
+import pytest
+
 
 def test_cli_contract_exists():
     import importlib
@@ -16,6 +18,17 @@ def test_download_cli_returns_manifest():
     manifest = cli.download_cli(dest=".", interactive=False)
     assert isinstance(manifest, models.DownloadManifest)
     assert hasattr(manifest, "entries")
+
+
+def test_download_cli_propagates_downloader_failure_instead_of_faking_a_manifest():
+    """A real failure in fetch_and_load must surface as an exception, not get
+    papered over with a synthetic manifest containing a fake resource_id."""
+    import importlib
+    cli = importlib.import_module("open_ksa.cli")
+
+    with patch("open_ksa.cli.downloader.fetch_and_load", side_effect=RuntimeError("boom")):
+        with pytest.raises(RuntimeError, match="boom"):
+            cli.download_cli(dest=".", interactive=False)
 
 
 def test_browse_cli_wires_organization_and_dataset_selection():

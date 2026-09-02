@@ -6,7 +6,7 @@ from typing import List, Optional
 from . import downloader
 from . import manifest as manifest_module
 from . import notebook
-from .models import DownloadManifest, ManifestEntry, SelectionRequest
+from .models import DownloadManifest
 
 
 def browse_cli(query: Optional[str] = None, dest: str = ".") -> Optional[DownloadManifest]:
@@ -30,56 +30,16 @@ def browse_cli(query: Optional[str] = None, dest: str = ".") -> Optional[Downloa
     return download_cli(dataset_id=dataset_id, organization_id=organization_id, dest=dest)
 
 
-def _fallback_manifest(
-    dataset_id: Optional[str], organization_id: Optional[str], dest: str, formats: Optional[list]
-) -> DownloadManifest:
-    """Build a synthetic manifest recording a failed download.
-
-    Used when `downloader.fetch_and_load` raises, so the CLI always has a
-    manifest to write and report on rather than crashing.
-    """
-    scope_type = "dataset" if dataset_id else "organization"
-    return DownloadManifest(
-        manifest_id="cli-fallback",
-        requested_scope=SelectionRequest(
-            scope_type=scope_type,
-            organization_ids=[organization_id] if organization_id else [],
-            dataset_ids=[dataset_id] if dataset_id else [],
-            formats=[fmt.lower() for fmt in formats] if formats else [],
-        ),
-        requested_at="",
-        dest_path=dest,
-        entries=[
-            ManifestEntry(
-                resource_id="demo-res-1",
-                dataset_id=dataset_id or "",
-                organization_id=organization_id or "",
-                download_url="https://example.com/demo.csv",
-                declared_format="csv",
-                observed_format="csv",
-                local_path=f"{dest.rstrip('/')}/demo.csv",
-                download_status="failed",
-                validation_status="recognized",
-                table_load_status="not_requested",
-                reason="fallback-demo",
-            )
-        ],
-    )
-
-
 def download_cli(dataset_id: Optional[str] = None, organization_id: Optional[str] = None, dest: str = '.', sample_size: int = 0, formats: Optional[list] = None, interactive: bool = False):
     """Execute a download via the canonical downloader and write a manifest to disk."""
-    try:
-        manifest, _ = downloader.fetch_and_load(
-            organization_id=organization_id,
-            dataset_id=dataset_id,
-            dest=dest,
-            sample_size=sample_size,
-            formats=formats,
-            interactive=interactive,
-        )
-    except Exception:
-        manifest = _fallback_manifest(dataset_id, organization_id, dest, formats)
+    manifest, _ = downloader.fetch_and_load(
+        organization_id=organization_id,
+        dataset_id=dataset_id,
+        dest=dest,
+        sample_size=sample_size,
+        formats=formats,
+        interactive=interactive,
+    )
 
     manifest_path = f"{dest.rstrip('/')}/manifest.json"
     manifest_module.write_manifest(manifest, manifest_path)
