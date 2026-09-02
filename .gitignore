@@ -25,6 +25,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+src/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -97,6 +98,7 @@ celerybeat-schedule
 # Environments
 .env
 .venv
+venv**
 env/
 venv/
 ENV/
@@ -153,3 +155,30 @@ opendata
 # Data types
 *.csv
 *.json
+.specify
+.cursor
+.ruff_cache
+.pytest_cache
+.mypy_cache
+.pytype
+.pyre
+.vscode
+.DS_Store
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.codegraph/
+
+# AI scaffolding / IDE (never public)
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+.wolf/
+.cursorrules
+.clinerules
+.windsurfrules
+.roo*
+memory-bank/
+.github/copilot-instructions.md

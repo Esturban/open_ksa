@@ -1,32 +1,31 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools", "wheel", "setuptools_scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "open_ksa"
-version = "0.1.1-dev2"
-#dynamic = ["version"]
+#version = "0.1.2"
+dynamic = ["version"]
 
 description = "Commands to download datasets from the Open Data portal of the Kingdom of Saudi Arabia (KSA)."
 authors = [
     { name = "Esteban Valencia", email = "me@estebanvalencia.com" }
 ]
-license = { text = "MIT" }
+license = "MIT"
 readme = "README.md"
 requires-python = ">=3.9.1"
 dependencies = [
     "requests>=2.32.3",
-    "urllib3>=2.2.3"
+    "urllib3>=2.2.3",
+    "setuptools_scm>=8.0.0",
+    "tqdm>=4.0.0"
 ]
-
-
-
 keywords = ["open data", "KSA", "datasets", "API"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: Implementation :: PyPy",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -37,14 +36,37 @@ maintainers = [
     { name = "Esteban Valencia", email = "me@estebanvalencia.com" }
 ]
 
+[project.scripts]
+open-ksa = "open_ksa.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Esturban/open_ksa"
+Repository = "https://github.com/Esturban/open_ksa"
+Changelog = "https://github.com/Esturban/open_ksa/blob/dev/RELEASE_NOTES.md"
+"KSA Open Data Portal" = "https://open.data.gov.sa/"
+
 [tool.setuptools]
-packages = ["open_ksa"]
+include-package-data = false
 
-#[tool.setuptools.dynamic]
-#version = {attr = "open_ksa.__version__"}
+[tool.setuptools.packages.find]
+include = ["open_ksa"]
+exclude = ["open_ksa.tests*"]
 
+[tool.setuptools.package-data]
+open_ksa = ["examples/*", "!examples/opendata/*"]
+
+[tool.setuptools_scm]
+version_scheme = "guess-next-dev"
+local_scheme = "no-local-version"
+
+[tool.pytest.ini_options]
+# Scope discovery to the real test suite -- without this, pytest's default
+# repo-wide "test_*.py" scan also picks up examples/workbooks/test_api.py,
+# a demo script (not a test) that imports openai, which isn't a CI dependency.
+testpaths = ["open_ksa/tests"]
 
 [project.optional-dependencies]
 dev = [
-    "pytest==7.0"
+    "build>=1.2.2",
+    "pytest>=7.0"
 ]

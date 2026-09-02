@@ -1,0 +1,76 @@
+name: Dev to Trunk Auto-PR
+
+# Opens (or refreshes) a PR from `dev` into this repo's trunk (default) branch on
+# every push to `dev`, requesting the repo owner (Esturban) as reviewer.
+#
+# EV's hard rule: a PR is ONLY ever opened by this Action -- never by a human or
+# agent running `gh pr create`. Push `dev` -> this Action opens the PR -> EV reviews.
+#
+# Idempotent + no-diff safe: if an open dev -> trunk PR already exists it is refreshed
+# (reviewer re-requested), not duplicated; if `dev` has no commits ahead of trunk the
+# run exits cleanly and fires again on the next push.
+
+on:
+  push:
+    branches: [dev]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  open-pr:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      TRUNK: ${{ github.event.repository.default_branch }}
+    steps:
+      - name: Checkout (full history for trunk..dev diff)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Open or refresh dev -> trunk PR
+        run: |
+          set -euo pipefail
+
+          # Hardcoded, not ${GITHUB_REPOSITORY_OWNER}: that resolves to the org
+          # name on org-owned repos (e.g. EV-Advisory), which isn't a valid PR
+          # reviewer/assignee target -- both calls silently no-op with `|| true`
+          # swallowing the error, so the Action reports success while doing nothing.
+          OWNER="Esturban"
+          echo "dev -> ${TRUNK} (reviewer: ${OWNER})"
+
+          # No commits on dev ahead of trunk -> nothing to PR (fires again next push).
+          if [ -z "$(git rev-list "origin/${TRUNK}..HEAD" 2>/dev/null || true)" ]; then
+            echo "No commits on dev ahead of ${TRUNK}; nothing to PR."
+            exit 0
+          fi
+
+          # Idempotency: refresh the existing open PR instead of opening a duplicate.
+          EXISTING="$(gh pr list --head dev --base "${TRUNK}" --state open --json number --jq '.[0].number // empty')"
+          if [ -n "${EXISTING}" ]; then
+            echo "PR #${EXISTING} already open for dev -> ${TRUNK}; re-requesting reviewer."
+            gh pr edit "${EXISTING}" --add-reviewer "${OWNER}" 2>/dev/null \
+              || gh pr edit "${EXISTING}" --add-assignee "${OWNER}" 2>/dev/null || true
+            exit 0
+          fi
+
+          TITLE="$(git log -1 --pretty=format:%s HEAD)"
+          [ -n "${TITLE}" ] || TITLE="dev -> ${TRUNK}"
+          BODY="Auto-opened by the \`Dev to Trunk Auto-PR\` action on push to \`dev\` (base: \`${TRUNK}\`). ${OWNER} requested as reviewer."
+
+          # The owner cannot always be a reviewer; fall back to assignee but never
+          # double-create: if the reviewer call already created the PR, just edit it.
+          if gh pr create --base "${TRUNK}" --head dev --title "${TITLE}" --body "${BODY}" --reviewer "${OWNER}"; then
+            echo "PR created with ${OWNER} as reviewer."
+          else
+            NUM="$(gh pr list --head dev --base "${TRUNK}" --state open --json number --jq '.[0].number // empty')"
+            if [ -n "${NUM}" ]; then
+              echo "PR #${NUM} exists; adding ${OWNER} as assignee."
+              gh pr edit "${NUM}" --add-assignee "${OWNER}" 2>/dev/null || true
+            else
+              echo "Reviewer path failed and no PR exists; creating with assignee."
+              gh pr create --base "${TRUNK}" --head dev --title "${TITLE}" --body "${BODY}" --assignee "${OWNER}"
+            fi
+          fi

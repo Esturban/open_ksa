@@ -1,13 +1,77 @@
-# Function to download a file
+import os
+import json
+import threading
 import requests
 
-def download_file(session, url, headers, file_path):
+# download_file() is called concurrently (via a ThreadPoolExecutor) from
+# downloader.py's fetch_and_load, and every call for resources in the same
+# destination directory reads, mutates, and rewrites the same missing.json.
+# This lock serializes that read-modify-write cycle per process so
+# concurrent writers can't lose each other's updates or produce a torn file.
+_missing_json_lock = threading.Lock()
+
+
+def _update_missing_ids(missing_file_path, resource_id, add):
+    with _missing_json_lock:
+        if os.path.exists(missing_file_path):
+            with open(missing_file_path, "r") as f:
+                missing_ids = set(json.load(f))
+        else:
+            missing_ids = set()
+        if add:
+            missing_ids.add(resource_id)
+        else:
+            missing_ids.discard(resource_id)
+        with open(missing_file_path, "w") as f:
+            json.dump(list(missing_ids), f, indent=4)
+
+
+def download_file(
+    session, url, headers, file_path, resource_id=None, verbose=None, skip_blank=True
+):
+    """Download the corresponding file from the Open Data Portal
+
+    Args:
+        session (Session): The session object to use for the request
+        url (str): The download URL for the file to try and download it locally
+        headers (dict): The dictionary of headers to be used in the GET request
+        file_path (str): Absolute path of where to download the file
+        resource_id (str): The ID of the resource
+        skip_blank (bool): Whether to skip downloading blank files (default: True)
+
+    Returns:
+        int: The length of the downloaded file in bytes
+    """
+    missing_file_path = os.path.join(os.path.dirname(file_path), "missing.json")
+
     try:
         response = session.get(url, headers=headers)
-        response.raise_for_status()  # Raise an HTTPError for bad responses
-        with open(file_path, 'wb') as file:
-            file.write(response.content)
-        return len(response.content)
+        response.raise_for_status()
+
+        # Decode content based on the response's encoding
+        content = response.content.decode(response.encoding or "utf-8", errors="ignore")
+        if (
+            content == "NO DATA FOUND"
+            or content.startswith("<html>")
+            or not content.strip()
+        ):
+            if verbose:
+                print(f"Invalid content received from {url}")
+            # Mark resource as missing
+            _update_missing_ids(missing_file_path, resource_id, add=True)
+            if skip_blank:
+                return 0
+
+        else:
+            # Write the content to the file
+            with open(file_path, "wb") as file:
+                file.write(response.content)
+            # Ensure resource_id is not marked as missing
+            _update_missing_ids(missing_file_path, resource_id, add=False)
+            return len(response.content)
     except requests.exceptions.RequestException as e:
-        print(f"Failed to download {url}: {e}")
+        if verbose:
+            print(f"Failed to download {url}: {e}")
+        # Mark resource as missing on exception
+        _update_missing_ids(missing_file_path, resource_id, add=True)
         return 0

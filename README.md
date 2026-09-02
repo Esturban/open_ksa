@@ -1,103 +1,156 @@
-## Open Data - Kingdom of Saudi Arabia  
- 
-> This repository contains scripts to download datasets from the Open Data portal of the Kingdom of Saudi Arabia (KSA). The main script downloads all datasets for a given organization ID and saves them locally.  
+# open-ksa
 
+## Overview
 
-### Directory Structure  
+`open-ksa` is a Python package designed to facilitate downloading and managing datasets from the Kingdom of Saudi Arabia's Open Data portal. It provides a set of utilities to fetch organization information, retrieve dataset resources, and download data files efficiently. This package is ideal for developers and data engineers looking to programmatically access and work with KSA open data.
 
-```{bash}
-.
-├── README.md
-├── download_all_org.py
-├── opendata (optional - parameter in file)
-├── requirements.txt
-├── open_ksa
-│   ├── download_file.py
-│   ├── organizations.py
-│   ├── get_dataset_resources.py
-│   └── get_org_resources.py
-└── system-drawing.excalidraw
+## Installation
 
+Install the package via pip:
+
+```bash
+pip install open-ksa
 ```
-### Functions Overview  
 
-- `organizations()`: Get the organization information, including the option to write to a target file as a CSV or JSON.
-- `get_org_resources(org_id)`: Retrieves the organization name, organization ID, and dataset IDs for the specified organization.
-- `get_dataset_resources(dataset_ids, allowed_exts=['csv', 'xlsx', 'xls'], output_dir='opendata/org_resources', verbose=False)`: Downloads all data resources for the specified dataset IDs.
-- `download_file(session, url, headers, file_path)`: Downloads a file from the specified URL using the provided session and headers.
+## Command Line Usage
 
-### Process Flow
+`pip install open-ksa` gives you an `open-ksa` command. You do not need to know an
+organization ID up front -- `browse` searches and lets you pick:
+
+```bash
+open-ksa browse --query water
+```
+
+This lists matching organizations, asks you to pick one, lists its datasets, asks you to
+pick one, and downloads it into the current directory (`--dest` to choose another). Once
+you already know an ID, `download` skips straight to it:
+
+```bash
+open-ksa download --dataset-id <dataset-id> --organization-id <organization-id>
+```
+
+## Key Features
+
+- Fetch organization details and metadata.
+- Retrieve dataset IDs and resources for specific organizations.
+- Download dataset resources with support for common file formats (CSV, XLSX, XLS).
+- Manage SSL connections with a custom adapter for reliable HTTPS requests.
+- Concurrent downloading with progress indication.
+
+## Package Structure
+
+- `organizations()`: Fetches organization information from the KSA Open Data API. Supports saving results to JSON or CSV.
+- `get_org_resources(org_id)`: Retrieves organization name, ID, and dataset IDs for a given organization.
+- `get_dataset_resource(dataset_id, ...)`: Downloads all resources for a single dataset matching allowed file extensions.
+- `get_dataset_resources(dataset_ids, ...)`: Concurrently downloads resources for multiple datasets.
+- `download_file(session, url, headers, file_path, resource_id, ...)`: Low-level utility to download a file with error handling.
+- `SSLAdapter` and `SingletonSession`: Custom SSL adapter and singleton session for consistent HTTPS requests.
+
+## Usage Examples
+
+### 1. List Organizations
+
+```python
+from open_ksa import organizations
+
+orgs = organizations()
+for org in orgs['content'][:10]:
+    print(org['name'])
+```
+
+### 2. Download Resources for a Single Dataset
+
+```python
+from open_ksa import get_dataset_resource
+
+dataset_id = 'e63563d0-3312-48f3-8786-7c3e2af61fe7'
+get_dataset_resource(dataset_id, verbose=True)
+```
+
+### 3. Download Resources for Multiple Datasets of an Organization
+
+```python
+from open_ksa import get_org_resources, get_dataset_resources
+
+org_id = 'a9e617ff-d918-4f4d-8be1-c42b733b1143'  # King Saud University
+resources = get_org_resources(org_id=org_id)
+dataset_ids = resources['dataset_ids']
+
+get_dataset_resources(dataset_ids=dataset_ids[:10],
+                      output_dir=f"opendata/{resources['organization_name'].strip().replace(' ', '_').lower()}",
+                      allowed_exts=['csv'],
+                      verbose=False,
+                      show_progress=True)
+```
+
+### 4. Full Workflow: Download All Datasets for an Organization
+
+```python
+import open_ksa as ok
+
+def main():
+    orgs = ok.organizations()
+    ks = orgs['content'][3]['publisherID']  # Select organization by index
+    resources = ok.get_org_resources(org_id=ks)
+    dataset_ids = resources['dataset_ids']
+
+    ok.get_dataset_resources(dataset_ids=dataset_ids,
+                             output_dir=f"opendata/{resources['organization_name'].strip().replace(' ', '_').lower()}")
+
+if __name__ == "__main__":
+    main()
+```
+
+## Process Flow Diagram
 
 ```mermaid
 graph TD
-    subgraph Initialization
-        A[Start] --> B[Create SSL Adapter]
-        B --> C[Setup Session]
-    end
-
-    subgraph Resource Extraction
-        C --> D[Extract Organization ID]
-        D --> E[Extract Dataset IDs]
-    end
-
-    subgraph Directory Setup
-        E --> F[Create Directory for Organization]
-    end
-
-    subgraph Data Download
-        F --> G[Download Dataset Resources]
-        G --> H[Save Data Locally]
-    end
-
-    H --> I[End]
+    A[Start] --> B[Create SSL Adapter and Session]
+    B --> C[Fetch Organization List]
+    C --> D[Select Organization ID]
+    D --> E[Fetch Dataset IDs for Organization]
+    E --> F[Download Dataset Resources]
+    F --> G[Save Files Locally]
+    G --> H[End]
 ```
 
-### Usage 
+## Running Tests
 
-To run the script with the dependencies, first install the `virtualenv`:
+Tests are located in the `open_ksa/tests` directory. From a fresh clone:
 
 ```bash
-
-python -m venv venv
-
-pip install -r requirements.txt
-
+git clone https://github.com/Esturban/open_ksa.git && cd open_ksa
+git checkout dev  # the CLI and console script live here until this branch merges to master
+python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
+.venv/bin/pytest open_ksa/tests
 ```
 
-
-Then you'll be able to run the python primary python script successfully:
+If you already have the repo and a virtual environment active:
 
 ```bash
-python download_all_org.py
+pip install -e ".[dev]"
+pytest open_ksa/tests
 ```
 
-NOTE: For a different organization, you need to update the parameter in the file for the `org_id` parameter in the function
+## Examples
 
+See the `examples/scripts` directory for practical usage scripts:
 
-### Release Plan / To DO
+- `1_organizations.py`: List organizations.
+- `2_get_dataset_resource.py`: Download resources for a single dataset.
+- `3_get_dataset_resources.py`: Download resources for multiple datasets.
+- `4_org_and_resources.py`: Full workflow to download all datasets for an organization.
 
-- [ ] Create a set of functions to cover the entire API, including:
-    - [X] Create a function to get the list of organizations
-    - [X] Create a function to get the list of datasets for an organization
-    - [X] Create a function to get the list of resources for a dataset
-    - [X] Create a function to download a resource
-    - [ ] Create a function to check the status of a download
-- [ ] Create a set of unit tests for the functions
-- [ ] Create a set of examples for the functions
-- [ ] Create a set of documentation for the functions
-- [ ] Move the repository to a PyPi library
+## Contribution
 
-### Contribution
+Please follow the contribution guidelines:
 
-The contribution process is as follows:
+1. Fork the repository and create a new branch.
+2. Make your changes following the coding style.
+3. Submit a pull request with a detailed description.
+4. Discuss changes via issues or email before implementation.
+5. Follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
-1. Clone the repository and create a new branch
-2. Make your changes, following the coding style guidelines
-3. Create a pull request with a detailed description of your changes
-4. Wait for your pull request to be reviewed and approved
-5. Once approved, your changes will be merged and available in the main branch
+## License
 
-When contributing to this repository, please first discuss the change you wish to make via issue,
-email, or any other method with the owners of this repository before making a change.
-
-Please note we have a code of conduct, please follow it in all your interactions with the project.
+This project is licensed under the terms of the MIT License. See the [LICENSE](LICENSE) file for details.
