@@ -3,10 +3,14 @@
 # Please see the documentation for more information:
 # https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
 # https://containers.dev/guide/dependabot
+#
+# FIX 2026-09-04: the devcontainers ecosystem entry was removed.
+# It failed every weekly run since 2026-07-20 with "Neither .devcontainer.json
+# nor .devcontainer/devcontainer.json ... found in /" even though
+# .devcontainer/devcontainer.json exists on this branch -- a Dependabot-side
+# resolution mismatch this repo's files cannot fix. No other ecosystem is
+# configured here; pip updates for this repo run through the separate
+# "Dependency Graph" workflow, not dependabot.yml.
 
 version: 2
-updates:
- - package-ecosystem: "devcontainers"
-   directory: "/"
-   schedule:
-     interval: weekly
+updates: []
