@@ -26,7 +26,7 @@ jobs:
           if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           # Pinned: an unpinned `pip install ruff` drifts CI's lint results away from what
-          # passes locally as ruff ships new default rules (OPS-2378 caught this: 165 CI
+          # passes locally as ruff ships new default rules (a lint run caught this: 165 CI
           # errors against a commit that lints clean locally on this exact version).
           pip install ruff==0.12.12 pytest 2>/dev/null || true
 

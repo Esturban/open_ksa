@@ -4,7 +4,7 @@
 # https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
 # https://containers.dev/guide/dependabot
 #
-# FIX 2026-09-04 (OPS-2955): the devcontainers ecosystem entry was removed.
+# FIX 2026-09-04: the devcontainers ecosystem entry was removed.
 # It failed every weekly run since 2026-07-20 with "Neither .devcontainer.json
 # nor .devcontainer/devcontainer.json ... found in /" even though
 # .devcontainer/devcontainer.json exists on this branch -- a Dependabot-side

@@ -94,7 +94,7 @@ This newer layer exists, but only part of the spec is implemented.
 
 - The spec is aspirational relative to the code.
   - `browse()` (in `downloader.py`) is unimplemented -- distinct from `cli.browse_cli()` below.
-  - `cli.browse_cli()` is implemented (OPS-2378): wires `notebook.browse_organizations`/
+  - `cli.browse_cli()` is implemented: wires `notebook.browse_organizations`/
     `notebook.browse_datasets` into a search-organization -> pick-dataset -> download flow,
     with no organization ID needed up front. Live-verified end to end.
   - `list_resources()` returns synthetic placeholder data.
