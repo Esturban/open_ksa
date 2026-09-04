@@ -1,11 +1,24 @@
 name: Sync Trunk to Dev
 
 # dev -> trunk promotion is a squash merge, which leaves `dev` one commit
-# behind trunk forever after ("master^N DIVERGED"). This job closes that gap by
-# opening a trunk -> dev PR after every push to trunk (master/main).
+# behind trunk forever after ("master^N DIVERGED"). This job closes that gap
+# after every push to trunk (master/main).
 #
-# EV's hard rule: this job only ever OPENS a PR. It never merges, fast-forwards,
-# or lands `dev` in CI -- EV reviews and merges the sync PR manually, full stop.
+# HOW IT CLOSES THE GAP, in order:
+#   1. If dev is an ancestor of trunk, fast-forward dev directly. Nothing on
+#      dev can be lost by a fast-forward, and the content being moved is
+#      already on trunk, which means it was reviewed on its way there. No PR,
+#      no CI run, no approval.
+#   2. If that push is refused (branch protection on dev), say so in the run
+#      log and fall through. Protection is never weakened to make it work.
+#   3. Fall-through opens the sync PR ONLY when trunk and dev actually differ
+#      in content. A PR whose file diff is empty is not a review, it is a
+#      button for a human to press, and it bills a CI run to do nothing.
+#
+# WHAT IT STILL NEVER DOES: it never merges a PR. When a real diff exists that
+# this token cannot push, the sync PR is opened for manual review and left
+# alone, exactly as before. Nothing unreviewed reaches dev by this route:
+# a fast-forward moves only commits that are already on trunk.
 
 on:
   push:
@@ -28,7 +41,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Open trunk -> dev sync PR (never auto-merged -- EV reviews manually)
+      - name: Sync trunk into dev (fast-forward if possible, PR only on a real diff)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REVIEWER: Esturban
@@ -50,12 +63,40 @@ jobs:
 
           git fetch origin dev "$BR" --quiet
 
-          # Nothing to sync if dev already contains everything on trunk (the
-          # common case: this job just merged its own prior sync PR).
+          # Nothing to sync if dev already contains every commit on trunk.
           if [ -z "$(git rev-list "origin/dev..origin/$BR" 2>/dev/null || true)" ]; then
-            echo "dev is already up to date with $BR -- skipping."; exit 0
+            echo "dev is already up to date with $BR -- nothing to sync."; exit 0
           fi
 
+          TRUNK_SHA="$(git rev-parse "origin/$BR")"
+
+          # ---- 1. Fast-forward -------------------------------------------------
+          # `merge-base --is-ancestor` is the entire safety argument: it is true
+          # only when every commit on dev is already on trunk, so the push cannot
+          # drop work. The refspec is a plain push, never --force, so the server
+          # itself rejects anything that is not a fast-forward even if the check
+          # above were somehow wrong.
+          if git merge-base --is-ancestor origin/dev "origin/$BR"; then
+            if git push origin "$TRUNK_SHA:refs/heads/dev"; then
+              echo "Fast-forwarded dev to $BR ($(git rev-parse --short "origin/$BR")). No PR opened, nothing for a human to approve."
+              exit 0
+            fi
+            echo "Fast-forward push to dev was REFUSED: branch protection on dev does not let this token push. Protection is left exactly as it is. Falling through to the diff check."
+          else
+            echo "dev carries commits that are not on $BR, so this is not a fast-forward. Falling through to the diff check."
+          fi
+
+          # ---- 2. A zero-line diff is not worth a PR ---------------------------
+          # The measured failure this guards: after a squash-merge promotion,
+          # trunk is one commit ahead of dev with an identical tree. The old
+          # workflow opened a PR for it anyway, which billed a CI run and put an
+          # item in a human's review queue to approve a diff of nothing.
+          if git diff --quiet "origin/$BR" origin/dev; then
+            echo "dev already contains trunk's content: $BR and dev differ in history only and the file diff is empty. No PR opened."
+            exit 0
+          fi
+
+          # ---- 3. A real diff this job cannot push: open the PR, never merge it
           SYNC_BRANCH="sync/${BR}-to-dev"
           git checkout -B "$SYNC_BRANCH" "origin/$BR"
           git push origin "$SYNC_BRANCH" --force-with-lease
@@ -71,9 +112,9 @@ jobs:
           gh pr create \
             --base dev --head "$SYNC_BRANCH" \
             --title "sync: $BR -> dev [skip ci]" \
-            --body "Auto-opened by the \`Sync Trunk to Dev\` action after a push to \`$BR\`. This keeps \`dev\` from drifting behind trunk after a squash-merge promotion. **This PR is opened for manual review only -- it is never auto-merged, fast-forwarded, or landed by CI.** \`$REVIEWER\` requested as reviewer." \
+            --body "Auto-opened by the \`Sync Trunk to Dev\` action after a push to \`$BR\`, because \`dev\` could not be fast-forwarded and \`$BR\` and \`dev\` genuinely differ in content. **This PR is opened for manual review only -- it is never auto-merged or landed by CI.** \`$REVIEWER\` requested as reviewer." \
             --reviewer "$REVIEWER" \
             || gh pr create --base dev --head "$SYNC_BRANCH" \
                  --title "sync: $BR -> dev [skip ci]" \
-                 --body "Auto-opened by the \`Sync Trunk to Dev\` action after a push to \`$BR\`. This keeps \`dev\` from drifting behind trunk after a squash-merge promotion. **This PR is opened for manual review only -- it is never auto-merged, fast-forwarded, or landed by CI.** \`$REVIEWER\` requested as reviewer." \
+                 --body "Auto-opened by the \`Sync Trunk to Dev\` action after a push to \`$BR\`, because \`dev\` could not be fast-forwarded and \`$BR\` and \`dev\` genuinely differ in content. **This PR is opened for manual review only -- it is never auto-merged or landed by CI.** \`$REVIEWER\` requested as reviewer." \
                  --assignee "$REVIEWER"
